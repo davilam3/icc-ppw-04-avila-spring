@@ -1,0 +1,6 @@
+spring:
+    application:
+        name: "fundamentos01"
+        # port: 900
+        # server_url: "wwwssssasd"
+
