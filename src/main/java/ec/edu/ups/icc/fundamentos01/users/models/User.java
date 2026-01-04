@@ -10,54 +10,53 @@ import ec.edu.ups.icc.fundamentos01.users.entities.UserEntity;
 
 public class User {
 
-     /// Variables de instancia
+    /// Variables de instancia
 
-    /// Constructores 
+    /// Constructores
 
     // Getters y Setters
-
-    // ==================== FACTORY METHODS ====================
 
     private int id;
     private String name;
     private String email;
     private String password;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    /**
-     * Crea un User desde un DTO de creación
-     * @param dto DTO con datos del formulario
-     * @return instancia de User para lógica de negocio
-     */
-    //public static User fromDto(CreateUserDto dto) {
-      
     public User(int id, String name, String email, String password) {
+        if (name == null || name.isBlank())
+            throw new IllegalArgumentException("Nombre inválido");
+
+        if (email == null || !email.contains("@"))
+            throw new IllegalArgumentException("Email inválido");
+
+        if (password == null || password.length() < 8)
+            throw new IllegalArgumentException("Password inválido");
+
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.createdAt = null;  // Se asignará por PrePersist
-        this.updatedAt = null;  // Se asignará por PreUpdate
+        this.createdAt = LocalDateTime.now();
     }
+
+    // ==================== FACTORY METHODS ====================
 
     /**
      * Constructor completo incluyendo fechas (para conversiones desde entidad)
      */
-    public User(int id, String name, String email, String password, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(int id, String name, String email, String password, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public User update(UpdateUserDto dto) {
-    this.name = dto.name;
-    this.email = dto.email;    
-    this.password = dto.password;
-    return this;
+        this.name = dto.name;
+        this.email = dto.email;
+        this.password = dto.password;
+        return this;
     }
 
     public User partialUpdate(PartialUpdateUserDto dto) {
@@ -75,24 +74,24 @@ public class User {
 
     /**
      * Crea un User desde una entidad persistente
+     * 
      * @param entity Entidad recuperada de la BD
      * @return instancia de User para lógica de negocio
      */
     public static User fromEntity(UserEntity entity) {
         return new User(
-            entity.getId().intValue(),
-            entity.getName(),
-            entity.getEmail(),
-            entity.getPassword(),
-            entity.getCreatedAt(),
-            entity.getUpdatedAt()
-        );
+                entity.getId().intValue(),
+                entity.getName(),
+                entity.getEmail(),
+                entity.getPassword(),
+                entity.getCreatedAt());
     }
 
     // ==================== CONVERSION METHODS ====================
 
     /**
      * Convierte este User a una entidad persistente
+     * 
      * @return UserEntity lista para guardar en BD
      */
     public UserEntity toEntity() {
@@ -101,15 +100,13 @@ public class User {
             entity.setId((long) this.id);
         }
         entity.setName(this.name);
-        
+
         // Preservar fechas si existen (para actualizaciones)
         if (this.createdAt != null) {
             entity.setCreatedAt(this.createdAt);
         }
-        if (this.updatedAt != null) {
-            entity.setUpdatedAt(this.updatedAt);
-        }
-        
+
+
         entity.setEmail(this.email);
         entity.setPassword(this.password);
         return entity;
@@ -155,13 +152,6 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
     public static User fromDto(CreateUserDto dto) {
         User user = new User(0, dto.name, dto.email, dto.password);

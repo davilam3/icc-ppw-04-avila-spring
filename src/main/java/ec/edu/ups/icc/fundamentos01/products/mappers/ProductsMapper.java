@@ -1,5 +1,4 @@
 package ec.edu.ups.icc.fundamentos01.products.mappers;
-
 import ec.edu.ups.icc.fundamentos01.products.dtos.CreateProductsDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.ProductsResponseDto;
 import ec.edu.ups.icc.fundamentos01.products.models.Product;
@@ -25,8 +24,7 @@ public class ProductsMapper {
         dto.name = product.getName();
         dto.price = product.getPrice();
         dto.stock = product.getStock();
-        dto.createdAt = product.getCreatedAt();
-        dto.updatedAt = product.getUpdatedAt();
+        dto.createdAt = product.getCreatedAt().toString();
         return dto;
     }
 

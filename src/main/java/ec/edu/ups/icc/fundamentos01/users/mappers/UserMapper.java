@@ -6,8 +6,9 @@ import ec.edu.ups.icc.fundamentos01.users.models.User;
 
 public class UserMapper {
 
-/**
+    /**
      * Convierte un User a un DTO de respuesta
+     * 
      * @param user Modelo de dominio
      * @return DTO con los datos públicos del usuario
      */
@@ -16,13 +17,13 @@ public class UserMapper {
         dto.id = user.getId();
         dto.name = user.getName();
         dto.email = user.getEmail();
-        dto.createdAt = user.getCreatedAt();
-        dto.updatedAt = user.getUpdatedAt();
+        dto.createdAt = user.getCreatedAt().toString();
         return dto;
     }
 
     /**
      * Convierte un DTO de creación a un User
+     * 
      * @param dto DTO del formulario de creación
      * @return instancia de User
      */
