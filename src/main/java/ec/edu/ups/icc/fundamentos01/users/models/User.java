@@ -2,6 +2,7 @@ package ec.edu.ups.icc.fundamentos01.users.models;
 
 import java.time.LocalDateTime;
 
+import ec.edu.ups.icc.fundamentos01.exceptions.domain.BadRequestException;
 import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
@@ -24,14 +25,13 @@ public class User {
 
     public User(int id, String name, String email, String password) {
         if (name == null || name.isBlank())
-            throw new IllegalArgumentException("Nombre inválido");
+            throw new BadRequestException("Nombre inválido");
 
         if (email == null || !email.contains("@"))
-            throw new IllegalArgumentException("Email inválido");
-
+            throw new BadRequestException("Email inválido");
+        
         if (password == null || password.length() < 8)
-            throw new IllegalArgumentException("Password inválido");
-
+            throw new BadRequestException("Password inválido");
         this.id = id;
         this.name = name;
         this.email = email;
@@ -106,7 +106,6 @@ public class User {
             entity.setCreatedAt(this.createdAt);
         }
 
-
         entity.setEmail(this.email);
         entity.setPassword(this.password);
         return entity;
@@ -151,7 +150,6 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
 
     public static User fromDto(CreateUserDto dto) {
         User user = new User(0, dto.name, dto.email, dto.password);

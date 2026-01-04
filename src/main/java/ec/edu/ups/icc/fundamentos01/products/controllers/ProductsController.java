@@ -2,6 +2,7 @@ package ec.edu.ups.icc.fundamentos01.products.controllers;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,9 +42,11 @@ public class ProductsController {
     }
 
     @PostMapping
+
     public ResponseEntity<ProductsResponseDto> create(
-        @Valid @RequestBody CreateProductsDto dto) {
-        return ResponseEntity.ok(productService.create(dto));
+            @Valid @RequestBody CreateProductsDto dto) {
+        ProductsResponseDto created = productService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
@@ -62,3 +65,9 @@ public class ProductsController {
     }
 
 }
+
+    // @PostMapping
+    // public ResponseEntity<ProductsResponseDto> create(
+    //     @Valid @RequestBody CreateProductsDto dto) {
+    //     return ResponseEntity.ok(productService.create(dto));
+    // }

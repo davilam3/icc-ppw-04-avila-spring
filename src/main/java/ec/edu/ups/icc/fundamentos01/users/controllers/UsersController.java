@@ -2,7 +2,8 @@ package ec.edu.ups.icc.fundamentos01.users.controllers;
 
 import java.util.List;
 
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,6 +19,7 @@ import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.UserResponseDto;
 import ec.edu.ups.icc.fundamentos01.users.services.UserService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
@@ -29,36 +31,39 @@ public class UsersController {
         this.userService = userService;
     }
 
-        @GetMapping
+    @GetMapping
     public List<UserResponseDto> findAll() {
         return userService.findAll();
     }
 
-        @GetMapping("/{id}")
-    public Object findOne(@PathVariable("id") int id) {
+    @GetMapping("/{id}")
+    public UserResponseDto findOne(@PathVariable("id") int id) {
         return userService.findOne(id);
     }
 
-        @PostMapping
-    public UserResponseDto create(@RequestBody CreateUserDto dto) {
-        return userService.create(dto);
+    @PostMapping
+    public ResponseEntity<UserResponseDto> create(
+            @Valid @RequestBody CreateUserDto userDto) {
+        UserResponseDto created = userService.create(userDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-        @PutMapping("/{id}")
-    public Object update(@PathVariable("id") int id, @RequestBody UpdateUserDto dto) {
+    @PutMapping("/{id}")
+    public UserResponseDto update(@PathVariable("id") int id, @RequestBody UpdateUserDto dto) {
         return userService.update(id, dto);
     }
 
-
-       @PatchMapping("/{id}")
-    public Object partialUpdate(@PathVariable("id") int id, @RequestBody PartialUpdateUserDto dto) {
+    @PatchMapping("/{id}")
+    public UserResponseDto partialUpdate(
+            @PathVariable("id") int id,
+            @RequestBody PartialUpdateUserDto dto) {
         return userService.partialUpdate(id, dto);
     }
 
-
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable("id") int id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") int id) {
         userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
