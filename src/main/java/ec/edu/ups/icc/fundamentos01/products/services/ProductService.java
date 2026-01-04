@@ -11,13 +11,13 @@ public interface ProductService {
 
     List<ProductsResponseDto> findAll();
 
-    Object findOne(int id);
+    ProductsResponseDto findOne(int id);
 
     ProductsResponseDto create(CreateProductsDto dto);
-    
-    Object update(int id, UpdateProductsDto dto);
 
-    Object partialUpdate(int id, PartialUpdateProductsDto dto);
+    ProductsResponseDto update(int id, UpdateProductsDto dto);
 
-    Object delete(int id);
+    ProductsResponseDto partialUpdate(int id, PartialUpdateProductsDto dto);
+
+    void delete(int id);
 }

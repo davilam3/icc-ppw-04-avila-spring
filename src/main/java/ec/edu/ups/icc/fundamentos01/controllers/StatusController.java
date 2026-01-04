@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -22,10 +22,5 @@ public class StatusController {
         );
     }
 
-     @GetMapping("/api/status-server")
-    public String getMethodName(@RequestParam String param) {
-        return new String();
-    }
-    
     
 }
