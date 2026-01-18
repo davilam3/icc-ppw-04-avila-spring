@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductsResponseDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
@@ -22,7 +23,7 @@ import ec.edu.ups.icc.fundamentos01.users.services.UserService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UsersController {
 
     private final UserService userService;
@@ -40,6 +41,13 @@ public class UsersController {
     public UserResponseDto findOne(@PathVariable("id") int id) {
         return userService.findOne(id);
     }
+
+    // @GetMapping("/{id}/products")
+    // public List<ProductsResponseDto> getProductsByUser(
+    //         @PathVariable Long id) {
+
+    //     return userService.getProductsByUserId(id);
+    // }
 
     @PostMapping
     public ResponseEntity<UserResponseDto> create(

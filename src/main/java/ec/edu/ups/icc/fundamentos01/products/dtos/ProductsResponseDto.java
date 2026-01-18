@@ -1,13 +1,37 @@
 package ec.edu.ups.icc.fundamentos01.products.dtos;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CategoriaResponseDto;
 
 public class ProductsResponseDto {
-    public int id;
+
+    public Long id;
     public String name;
     public String description;
-    public BigDecimal price;
+    public Double price;
     public Integer stock;
-    public String createdAt;
-   
+
+    // ============== OBJETOS ANIDADOS ==============
+
+    public UserSummaryDto userId;
+
+    // public CategoryResponseDto category;
+    // ============== CATEGORÍAS (N:N) - Lista de objetos ==============
+    public List<CategoriaResponseDto> categoryIds;
+
+    // ============== AUDITORÍA =============
+
+    public LocalDateTime createdAt;
+    public LocalDateTime updatedAt;
+
+    // ============== DTOs INTERNOS ==============
+
+    public static class UserSummaryDto {
+        public long id;
+        public String name;
+        public String email;
+    }
+
 }

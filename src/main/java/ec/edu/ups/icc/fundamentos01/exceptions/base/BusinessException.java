@@ -1,0 +1,14 @@
+package ec.edu.ups.icc.fundamentos01.exceptions.base;
+
+import org.springframework.http.HttpStatus;
+
+public class BusinessException extends ApplicationException {
+
+    public BusinessException(String message) {
+        super(HttpStatus.UNPROCESSABLE_ENTITY, message);
+    }
+
+    protected BusinessException(HttpStatus status, String message) {
+        super(status, message);
+    }
+}
