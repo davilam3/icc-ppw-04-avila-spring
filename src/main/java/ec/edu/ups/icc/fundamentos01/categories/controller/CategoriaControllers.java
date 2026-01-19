@@ -25,17 +25,43 @@ public class CategoriaControllers {
         this.categoriaService = categoriaService;
     }
 
-    //LISTAR CATEGORIAS
-    @GetMapping
-    public ResponseEntity<List<CategoriaResponseDto>> findAll() {
-        return ResponseEntity.ok(categoriaService.findAll());
-    }
-
-    //CREAR CATEGORIA
+    // CREAR CATEGORIA
     @PostMapping()
     public ResponseEntity<String> save(@Valid @RequestBody CreateCategoriaDto categoriaDto) {
         categoriaService.save(categoriaDto);
         return ResponseEntity.ok("Categoría creada");
     }
+
+    // LISTAR CATEGORIAS
+    @GetMapping
+    public ResponseEntity<List<CategoriaResponseDto>> findAll() {
+        return ResponseEntity.ok(categoriaService.findAll());
+    }
+
+    // @GetMapping("/{id}")
+    // public ResponseEntity<CategoriaResponseDto> findById(@PathVariable Long id) {
+    //     CategoriaResponseDto response = categoriaService.findById(id);
+    //     return ResponseEntity.ok(response);
+    // }
+
+    // @PutMapping("/{id}")
+    // public ResponseEntity<CategoriaResponseDto> update(
+    //         @PathVariable Long id,
+    //         @Valid @RequestBody UpdateCategoryDto dto) {
+    //     CategoriaResponseDto response = categoryService.update(id, dto);
+    //     return ResponseEntity.ok(response);
+    // }
+
+    // @DeleteMapping("/{id}")
+    // public ResponseEntity<Void> delete(@PathVariable Long id) {
+    //     categoryService.delete(id);
+    //     return ResponseEntity.noContent().build();
+    // }
+
+    // @GetMapping("/{id}/products/count")
+    // public ResponseEntity<Long> countProductsByCategory(@PathVariable Long id) {
+    //     CategoryResponseDto category = categoryService.findById(id);
+    //     return ResponseEntity.ok((long) category.productCount);
+    // }
 
 }

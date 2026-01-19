@@ -261,6 +261,7 @@ public class ProductServiceImpl implements ProductService {
             categoryDto.id = categoryEntity.getId();
             categoryDto.name = categoryEntity.getName();
             categoryDto.description = categoryEntity.getDescription();
+            
             categories.add(categoryDto);
         }
 

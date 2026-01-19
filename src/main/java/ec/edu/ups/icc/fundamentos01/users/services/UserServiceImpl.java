@@ -6,8 +6,14 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import ec.edu.ups.icc.fundamentos01.categories.dtos.CategoriaResponseDto;
+import ec.edu.ups.icc.fundamentos01.categories.entity.CategoryEntity;
 import ec.edu.ups.icc.fundamentos01.exceptions.domain.ConflictException;
 import ec.edu.ups.icc.fundamentos01.exceptions.domain.NotFoundException;
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
+import ec.edu.ups.icc.fundamentos01.products.entities.ProductsEntity;
+import ec.edu.ups.icc.fundamentos01.products.mappers.ProductsMapper;
+import ec.edu.ups.icc.fundamentos01.products.repositories.ProductsRepository;
 import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
@@ -21,8 +27,10 @@ import ec.edu.ups.icc.fundamentos01.users.repositories.UserRepository;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
+    private final ProductsRepository productRepository;
 
-    public UserServiceImpl(UserRepository userRepo) {
+    public UserServiceImpl(UserRepository userRepo, ProductsRepository productRepository) {
+        this.productRepository = productRepository;
         this.userRepo = userRepo;
     }
 
@@ -53,8 +61,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto findOne(int id) {
-        return userRepo.findById((long) id)
+    public UserResponseDto findOne(Long id) {
+        return userRepo.findById(id)
                 .map(User::fromEntity)
                 .map(UserMapper::toResponse)
                 .orElseThrow(() -> new NotFoundException("Usuario con id: " + id + " no encontrado"));
@@ -83,7 +91,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto update(int id, UpdateUserDto dto) {
+    public UserResponseDto update(Long id, UpdateUserDto dto) {
         return userRepo.findById((long) id)
                 // Entity → Domain
                 .map(User::fromEntity)
@@ -104,7 +112,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto partialUpdate(int id, PartialUpdateUserDto dto) {
+    public UserResponseDto partialUpdate(Long id, PartialUpdateUserDto dto) {
 
         return userRepo.findById((long) id)
                 // Entity → Domain
@@ -130,7 +138,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Long id) {
         // Verifica existencia y elimina
         userRepo.findById((long) id)
                 .ifPresentOrElse(
@@ -139,4 +147,78 @@ public class UserServiceImpl implements UserService {
                             throw new NotFoundException("Usuario con id: " + id + " no encontrado");
                         });
     }
+
+    @Override
+    public List<ProductResponseDto> getProductsByUserId(Long userId) {
+
+        // 1. Verificar que el usuario exista
+        userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Usuario con id: " + userId + " no encontrado"));
+
+        // 2. Consultar productos desde el repositorio de productos
+        return productRepository.findByOwnerId(userId)
+                .stream()
+                .map(product -> new ProductResponseDto(
+                        product.getId(),
+                        product.getName(),
+                        product.getPrice(),
+                        product.getDescription()
+                // product.getCategoris()
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<ProductResponseDto> getProductsByUserIdWithFilters(
+            Long userId,
+            String name,
+            Double minPrice,
+            Double maxPrice,
+            Long categoryId) {
+
+        List<ProductsEntity> products = productRepository.findByOwnerWithFilter(
+                userId,
+                name,
+                minPrice,
+                maxPrice,
+                categoryId);
+
+        return products.stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    private ProductResponseDto toResponseDto(ProductsEntity entity) {
+        ProductResponseDto dto = new ProductResponseDto();
+
+        dto.id = entity.getId();
+        dto.name = entity.getName();
+        dto.price = entity.getPrice();
+        dto.description = entity.getDescription();
+
+        // User
+        ProductResponseDto.UserSummaryDto userDto = new ProductResponseDto.UserSummaryDto();
+        userDto.id = entity.getOwner().getId();
+        userDto.name = entity.getOwner().getName();
+        userDto.email = entity.getOwner().getEmail();
+        dto.user = userDto;
+
+        // Categories
+        List<CategoriaResponseDto> categories = new ArrayList<>();
+        for (CategoryEntity c : entity.getCategories()) {
+            CategoriaResponseDto catDto = new CategoriaResponseDto();
+            catDto.id = c.getId();
+            catDto.name = c.getName();
+            catDto.description = c.getDescription();
+            categories.add(catDto);
+        }
+        dto.categories = categories;
+
+        dto.createdAt = entity.getCreatedAt();
+        dto.updatedAt = entity.getUpdatedAt();
+
+        return dto;
+    }
+
 }

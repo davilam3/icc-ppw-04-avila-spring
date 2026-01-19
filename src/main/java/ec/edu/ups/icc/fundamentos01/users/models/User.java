@@ -1,13 +1,20 @@
 package ec.edu.ups.icc.fundamentos01.users.models;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import ec.edu.ups.icc.fundamentos01.exceptions.domain.BadRequestException;
+import ec.edu.ups.icc.fundamentos01.products.models.Product;
 import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.UserResponseDto;
 import ec.edu.ups.icc.fundamentos01.users.entities.UserEntity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 public class User {
 
@@ -17,19 +24,25 @@ public class User {
 
     // Getters y Setters
 
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
     private String email;
     private String password;
     private LocalDateTime createdAt;
 
-    public User(int id, String name, String email, String password) {
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    private List<Product> products;
+
+    public User(long id, String name, String email, String password) {
         if (name == null || name.isBlank())
             throw new BadRequestException("Nombre inválido");
 
         if (email == null || !email.contains("@"))
             throw new BadRequestException("Email inválido");
-        
+
         if (password == null || password.length() < 8)
             throw new BadRequestException("Password inválido");
         this.id = id;
@@ -44,7 +57,7 @@ public class User {
     /**
      * Constructor completo incluyendo fechas (para conversiones desde entidad)
      */
-    public User(int id, String name, String email, String password, LocalDateTime createdAt) {
+    public User(Long id, String name, String email, String password, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -83,8 +96,7 @@ public class User {
                 entity.getId().intValue(),
                 entity.getName(),
                 entity.getEmail(),
-                entity.getPassword(),
-                entity.getCreatedAt());
+                entity.getPassword());
     }
 
     // ==================== CONVERSION METHODS ====================
@@ -111,11 +123,11 @@ public class User {
         return entity;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

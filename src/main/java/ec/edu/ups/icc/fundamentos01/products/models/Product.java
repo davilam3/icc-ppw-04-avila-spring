@@ -5,18 +5,33 @@ import ec.edu.ups.icc.fundamentos01.products.dtos.PartialUpdateProductsDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.UpdateProductsDto;
 import ec.edu.ups.icc.fundamentos01.products.entities.ProductsEntity;
 import ec.edu.ups.icc.fundamentos01.users.entities.UserEntity;
+import ec.edu.ups.icc.fundamentos01.users.models.User;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 public class Product {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private Double price;
     private String description;
     private String CreatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
     // Contructor para forzar el uso de factory metodos
 
-    public Product() {}
+    public Product() {
+    }
 
     public Product(long id, String name, Double price, String description) {
         this.id = id;
@@ -145,6 +160,16 @@ public class Product {
         }
         return this;
     }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    
 
 }
 

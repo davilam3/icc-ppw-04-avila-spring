@@ -12,5 +12,6 @@ import ec.edu.ups.icc.fundamentos01.users.entities.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByEmail(String email);
+    //boolean
 
 }

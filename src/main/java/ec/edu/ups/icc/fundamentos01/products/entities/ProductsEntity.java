@@ -124,4 +124,6 @@ public class ProductsEntity extends BaseModel {
         this.categories.clear();
     }
 
+    
+
 }
