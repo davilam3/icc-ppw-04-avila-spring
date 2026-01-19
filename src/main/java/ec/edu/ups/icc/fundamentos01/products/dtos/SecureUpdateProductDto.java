@@ -1,29 +1,34 @@
 package ec.edu.ups.icc.fundamentos01.products.dtos;
 
-import java.util.Set;
+import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class SecureUpdateProductDto {
-    public String name;
-    public Double price;
-    public String description;
-    public String reason;
-    public Long categoryId;
 
-    // ============== RELACIONES ==============
+    public Double price;
+    public String reason;
+
+    @NotBlank
+    @Size(min = 3, max = 150)
+    public String name;
+
+    @NotBlank
+    @Size(min = 5, max = 500)
+    public String description;
+
+    // Relaciones
 
     @NotNull(message = "El ID del usuario es obligatorio")
     public Long userId;
 
-    // ============== n:m ==============
-
     // @NotNull(message = "El ID de la categoría es obligatorio")
-    // public SetLong categoryIds;
+    // public Long categoryId;
 
-    @NotNull(message = "Debe especificar al menos una categoría")
-    @Size(min = 1, message = "El producto debe tener al menos una categoría")
-    public Set<Long> categoryIds; // Múltiples categorías
+    @NotNull(message = "Los IDs de las categorías son obligatorios")
+    @Size(min = 1, message = "Debe ingresar al menos un ID de categoría")
+    public List<Long> categoryIds;
 
 }

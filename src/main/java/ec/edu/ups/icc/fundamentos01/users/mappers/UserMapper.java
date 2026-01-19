@@ -22,6 +22,10 @@ public class UserMapper {
         return dto;
     }
 
+    public static User toEntity(int id, String name, String email, String password) {
+        return new User(id, name, email, password   );
+    }
+
     /**
      * Convierte un DTO de creación a un User
      * 

@@ -9,8 +9,8 @@ public interface CategoriaService {
 
     List<CategoriaResponseDto> findAll();
 
-    void save(CreateCategoriaDto categoriaDto);
+    void save(CreateCategoriaDto dto);
 
-    // CategoriaResponseDto create(CreateCategoriaDto categoriaDto);
+    // public CategoriaResponseDto create(CreateCategoriaDto categoriaDto);
 
 }

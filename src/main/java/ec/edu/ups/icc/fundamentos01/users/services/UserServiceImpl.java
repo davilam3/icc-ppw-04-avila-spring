@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import ec.edu.ups.icc.fundamentos01.exceptions.domain.ConflictException;
 import ec.edu.ups.icc.fundamentos01.exceptions.domain.NotFoundException;
-import ec.edu.ups.icc.fundamentos01.products.repositories.ProductsRepository;
 import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.UpdateUserDto;
@@ -22,11 +21,9 @@ import ec.edu.ups.icc.fundamentos01.users.repositories.UserRepository;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
-    private final ProductsRepository productRepo;
 
-    public UserServiceImpl(UserRepository userRepo, ProductsRepository productRepo) {
+    public UserServiceImpl(UserRepository userRepo) {
         this.userRepo = userRepo;
-        this.productRepo = productRepo;
     }
 
     // Forma iterativa tradicional
@@ -77,6 +74,12 @@ public class UserServiceImpl implements UserService {
                 .map(User::fromEntity)
                 .map(UserMapper::toResponse)
                 .orElseThrow(() -> new ConflictException("Error al crear el usuario" + dto));
+
+        // User user = User.fromDto(dto);
+
+        // UserEntity saved = userRepo.save(user.toEntity());
+
+        // return UserMapper.toResponse(User.fromEntity(saved));
     }
 
     @Override
@@ -136,21 +139,4 @@ public class UserServiceImpl implements UserService {
                             throw new NotFoundException("Usuario con id: " + id + " no encontrado");
                         });
     }
-
-    
-    // @Override
-    // public List<ProductsResponseDto> getProductsByUserId(Long userId) {
-
-    //     // 1. Validar que el usuario exista
-    //     if (!userRepo.existsById(userId)) {
-    //         throw new NotFoundException(
-    //                 "Usuario no encontrado con ID: " + userId);
-    //     }
-
-    //     // 2. Consultar productos del usuario
-    //     return productRepo.findByOwnerId(userId)
-    //             .stream()
-    //             .map(ProductsMapper::toResponse)
-    //             .toList();
-    // }
 }

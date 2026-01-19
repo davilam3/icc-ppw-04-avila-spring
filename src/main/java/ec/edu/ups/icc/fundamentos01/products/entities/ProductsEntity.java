@@ -24,15 +24,10 @@ public class ProductsEntity extends BaseModel {
     private String name;
 
     @Column(nullable = false)
-    private Double price;
+    private double price;
 
-    @Column(nullable = false)
+    @Column(length = 500)
     private String description;
-
-    @Column(nullable = false)
-    private Integer stock;
-
-    // atributos relacionales
 
     // ================== RELACIONES 1:N ==================
 
@@ -41,32 +36,32 @@ public class ProductsEntity extends BaseModel {
      * Muchos productos pertenecen a un usuario (owner/creator)
      */
 
-    // con usuarios donde un usuario peude tener muchos productos
-    @ManyToOne(optional = false, fetch = FetchType.LAZY) // todo producto debe tener un dueño
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity owner; // ENTIDAD owner es solo una variable que representa al usuario dueño del
-                              // producto
+    private UserEntity owner;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY) // todo producto debe tener una categoria
-    @JoinColumn(name = "category_id", nullable = false)
-    private CategoryEntity category; // ENTIDAD category es solo una variable que representa la categoria del
-                                     // producto
-
-    // ============== NUEVA RELACIÓN N:N ==============
+    /**
+     * Relación Many-to-One con Category
+     * Muchos productos pertenecen a una categoría
+     */
+    // @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    // @JoinColumn(name = "category_id", nullable = false)
+    // private CategoryEntity category;
 
     /**
      * Relación Many-to-Many con Category
      * Un producto puede tener múltiples categorías
      * Una categoría puede estar en múltiples productos
      */
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "product_categories", // Tabla intermedia
-    joinColumns = @JoinColumn(name = "product_id"), // FK hacia products
-    inverseJoinColumns = @JoinColumn(name = "category_id") // FK hacia categories
+            joinColumns = @JoinColumn(name = "product_id"), // FK hacia products
+            inverseJoinColumns = @JoinColumn(name = "category_id") // FK hacia categories
     )
-    private Set<CategoryEntity> categories; // = new HashSet<>()
 
-    // Constructores
+    private Set<CategoryEntity> categories = new HashSet<>();
+
     public ProductsEntity() {
     }
 
@@ -102,57 +97,31 @@ public class ProductsEntity extends BaseModel {
         this.owner = owner;
     }
 
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
-    public CategoryEntity getCategory() {
-        return category;
-    }
-
-    public void setCategory(CategoryEntity category) {
-        this.category = category;
-    }
-
-    //
-
     public Set<CategoryEntity> getCategories() {
-    return categories;
+        return categories;
     }
 
     public void setCategories(Set<CategoryEntity> categories) {
-    this.categories = categories;
+        this.categories = categories;
     }
 
     public void addCategory(CategoryEntity category) {
-    this.categories.add(category);
-    // category.getProducts().add(this); // Sincroniza el otro lado
+        this.categories.add(category);
     }
 
     /**
-    * Remueve una categoría del producto y sincroniza la relación bidireccional
-    */
+     * Remueve una categoría del producto y sincroniza la relación bidireccional
+     */
 
     public void removeCategory(CategoryEntity category) {
-    this.categories.remove(category);
-    // category.getProducts().remove(this); // Sincroniza el otro lado
+        this.categories.remove(category);
     }
 
-    /**
-    * Limpia todas las categorías y sincroniza las relaciones
-    */
-
-    public void clearCategories(CategoryEntity category) {
-    // Primero remover de cada categoría
-    for (CategoryEntity categoria : new HashSet<>(this.categories)) {
-    // category.getProducts().remove(this);
-    }
-    // Luego limpiar la colección local
-    this.categories.clear();
+    public void clearCategories() {
+        for (CategoryEntity category : new HashSet<>(this.categories)) {
+            category.getProducts().remove(this);
+        }
+        this.categories.clear();
     }
 
 }

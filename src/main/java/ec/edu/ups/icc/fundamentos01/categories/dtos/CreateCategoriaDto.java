@@ -12,20 +12,4 @@ public class CreateCategoriaDto {
     @Size(min = 3, max = 500, message = "La descripcion debe tener entre 3 y 300 caracteres")
     public String description;
 
-     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) { 
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
 }

@@ -1,13 +1,12 @@
 package ec.edu.ups.icc.fundamentos01.products.services;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
-import ec.edu.ups.icc.fundamentos01.products.dtos.ProductsResponseDto;
+import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.SecureUpdateProductDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.UpdateProductsDto;
 import ec.edu.ups.icc.fundamentos01.products.entities.ProductsEntity;
@@ -32,15 +31,15 @@ public class ProductServiceImpl implements ProductService {
     private final UserRepository userRepo;
     private final CategoryRepository categoryRepo;
 
-    public ProductServiceImpl(ProductsRepository productRepo, UserRepository userRepo,
+    public ProductServiceImpl(ProductsRepository productsRepo, UserRepository userRepo,
             CategoryRepository categoryRepo) {
-        this.productsRepo = productRepo;
+        this.productsRepo = productsRepo;
         this.userRepo = userRepo;
         this.categoryRepo = categoryRepo;
     }
 
     @Override
-    public List<ProductsResponseDto> findAll() {
+    public List<ProductResponseDto> findAll() {
         return productsRepo.findAll()
                 .stream()
                 .map(this::toResponseDto)
@@ -48,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductsResponseDto findOne(Long id) {
+    public ProductResponseDto findOne(Long id) {
         return productsRepo.findById((long) id)
                 .map(Product::fromEntity)
                 .map(ProductsMapper::toResponse)
@@ -56,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductsResponseDto create(CreateProductsDto dto) {
+    public ProductResponseDto create(CreateProductsDto dto) {
         // 1. VALIDAR EXISTENCIA DE RELACIONES
         UserEntity owner = userRepo.findById(dto.userId)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado con ID: " + dto.userId));
@@ -66,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
         // dto.categoryId));
 
         // 2. VALIDAR Y OBTENER CATEGORÍAS
-        Set<CategoryEntity> categories = validateAndGetCategories(dto.categoryIds);
+        Set<CategoryEntity> categories = validateAndGetCategories(new HashSet<>(dto.categoryIds));
 
         // Regla: nombre único
         if (productsRepo.findByName(dto.name).isPresent()) {
@@ -78,7 +77,10 @@ public class ProductServiceImpl implements ProductService {
 
         // 3. CONVERTIR A ENTIDAD CON RELACIONES
         ProductsEntity entity = product.toEntity(owner);
-        entity.setCategories(categories);
+        // agregar categorías UNA POR UNA
+        for (CategoryEntity category : categories) {
+            entity.addCategory(category);
+        }
 
         // 4. PERSISTIR
         ProductsEntity saved = productsRepo.save(entity);
@@ -88,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductsResponseDto update(Long id, UpdateProductsDto dto) {
+    public ProductResponseDto update(Long id, UpdateProductsDto dto) {
         // 1. BUSCAR PRODUCTO EXISTENTE
         ProductsEntity existing = productsRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado con ID: " + id));
@@ -98,7 +100,7 @@ public class ProductServiceImpl implements ProductService {
         // .orElseThrow(() -> new NotFoundException("Categoría no encontrada con ID: " +
         // dto.categoryId));
 
-        Set<CategoryEntity> categories = validateAndGetCategories(dto.categoryIds);
+        Set<CategoryEntity> categories = validateAndGetCategories(new HashSet<>(dto.categoryIds));
 
         // 3. ACTUALIZAR USANDO DOMINIO
         Product product = Product.fromEntity(existing);
@@ -108,7 +110,7 @@ public class ProductServiceImpl implements ProductService {
         ProductsEntity updated = product.toEntity(existing.getOwner());
         updated.setId(id); // Asegurar que mantiene el ID
 
-        updated.clearCategories(null);
+        updated.clearCategories();
         for (CategoryEntity category : categories) {
             updated.addCategory(category);
         }
@@ -119,9 +121,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductsResponseDto> findByUserId(Long userId) {
+    public List<ProductResponseDto> findByUserId(Long userId) {
 
-        // Validar que el usuario existe
+        //Validar que el usuario existe
         if (!userRepo.existsById(userId)) {
             throw new NotFoundException("Usuario no encontrado con ID: " + userId);
         }
@@ -133,37 +135,36 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductsResponseDto> findByCategoryId(Long categoryId) {
+    public List<ProductResponseDto> findByCategoryId(Long categoryId) {
 
         // // Validar que la categoría existe
         // if (!categoryRepo.existsById(categoryId)) {
         // throw new NotFoundException("Categoría no encontrada con ID: " + categoryId);
         // }
 
-        // return productRepo.findByCategoryId(categoryId)
+        // return productsRepo.findByCategoryId(categoryId)
         // .stream()
         // .map(this::toResponseDto)
         // .toList();
-
         return null;
     }
 
     @Override
-    public ProductsResponseDto partialUpdate(Long id, PartialUpdateProductsDto dto) {
+    public ProductResponseDto partialUpdate(Long id, PartialUpdateProductsDto dto) {
 
         // 1. BUSCAR PRODUCTO EXISTENTE
         ProductsEntity existing = productsRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado con ID: " + id));
 
         // 2. VALIDAR NUEVA CATEGORÍA
-        Set<CategoryEntity> categoriaEntities = validateAndGetCategories(dto.categoryIds);
+        Set<CategoryEntity> categoriaEntities = validateAndGetCategories(new HashSet<>(dto.categoryIds));
 
         // 3. ACTUALIZAR USANDO Instancia de entidad
         existing.setDescription(dto.description != null ? dto.description : existing.getDescription());
         existing.setName(dto.name != null ? dto.name : existing.getName());
         existing.setPrice(dto.price != null ? dto.price : existing.getPrice());
 
-        existing.clearCategories(null);
+        existing.clearCategories();
 
         existing.setCategories(categoriaEntities);
         // 5. PERSISTIR Y RESPONDER
@@ -176,7 +177,7 @@ public class ProductServiceImpl implements ProductService {
     public void delete(Long id) {
 
         // Verifica existencia y elimina
-        productsRepo.findById((Long) id)
+        productsRepo.findById((long) id)
                 .ifPresentOrElse(
                         productsRepo::delete,
                         () -> {
@@ -184,19 +185,8 @@ public class ProductServiceImpl implements ProductService {
                         });
     }
 
-    // @Override
-    // public void delete(Long id) {
-    // // Verifica existencia y elimina
-    // productsRepo.findById(id)
-    // .ifPresentOrElse(
-    // productsRepo::delete,
-    // () -> {
-    // throw new NotFoundException("Producto con id: " + id + " no encontrado");
-    // });
-    // }
-
     @Override
-    public boolean validateName(Integer id, String name) {
+    public boolean validateName(Long id, String name) {
         productsRepo.findByName(name)
                 .ifPresent(existing -> {
                     if (id == null || existing.getId() != id.longValue()) {
@@ -208,24 +198,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductsResponseDto secureUpdate(Long id, SecureUpdateProductDto dto) {
+    public ProductResponseDto secureUpdate(int id, SecureUpdateProductDto dto) {
 
-        // 1. Validar usuario
         UserEntity owner = userRepo.findById(dto.userId)
-                .orElseThrow(() -> new NotFoundException(
-                        "Usuario no encontrado con ID: " + dto.userId));
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado con ID: " + dto.userId));
 
-        // 2. Validar producto
-        ProductsEntity entity = productsRepo.findById(id)
+        // CategoryEntity category = categoryRepo.findById(dto.categoryId)
+        // .orElseThrow(() -> new NotFoundException("Categoría no encontrada con ID: " +
+        // dto.categoryId));
+
+        Set<CategoryEntity> categories = validateAndGetCategories(new HashSet<>(dto.categoryIds));
+
+        ProductsEntity entity = productsRepo.findById((long) id)
                 .orElseThrow(() -> new BusinessException("Producto no encontrado"));
 
-        // 3. Validar categoría (UNA sola)
-        CategoryEntity category = categoryRepo.findById(dto.categoryId)
-                .orElseThrow(() -> new NotFoundException(
-                        "Categoría no encontrada con ID: " + dto.categoryId));
-        entity.setCategory(category);
-
-        // 4. Regla de negocio
         if (dto.price != null && dto.price > 1000) {
             if (dto.reason == null || dto.reason.isBlank()) {
                 throw new BusinessException(
@@ -233,7 +219,6 @@ public class ProductServiceImpl implements ProductService {
             }
         }
 
-        // 5. Actualizar dominio
         Product product = Product.fromEntity(entity);
 
         if (dto.name != null)
@@ -243,61 +228,17 @@ public class ProductServiceImpl implements ProductService {
         if (dto.description != null)
             product.setDescription(dto.description);
 
-        // 6. Convertir a entidad y asignar relaciones
-        ProductsEntity updated = product.toEntity(owner);
-        updated.setId(id);
-
-        // 7. Guardar
-        ProductsEntity saved = productsRepo.save(updated);
+        ProductsEntity saved = productsRepo.save(product.toEntity(owner));
 
         return ProductsMapper.toResponse(Product.fromEntity(saved));
     }
-
-    // @Override
-    // public ProductsResponseDto secureUpdate(Long id, SecureUpdateProductDto dto)
-    // {
-
-    // UserEntity owner = userRepo.findById(dto.userId)
-    // .orElseThrow(() -> new NotFoundException("Usuario no encontrado con ID: " +
-    // dto.userId));
-
-    // // CategoryEntity category = categoryRepo.findById(dto.categoryId)
-    // // .orElseThrow(() -> new NotFoundException("Categoría no encontrada con ID:
-    // " +
-    // // dto.categoryId));
-
-    // Set<CategoryEntity> categories = validateAndGetCategories(dto.categoryIds);
-
-    // ProductsEntity entity = productsRepo.findById((long) id)
-    // .orElseThrow(() -> new BusinessException("Producto no encontrado"));
-
-    // if (dto.price != null && dto.price > 1000) {
-    // if (dto.reason == null || dto.reason.isBlank()) {
-    // throw new BusinessException(
-    // "Productos con precio mayor a 1000 requieren justificación");
-    // }
-    // }
-
-    // Product product = Product.fromEntity(entity);
-
-    // if (dto.name != null)
-    // product.setName(dto.name);
-    // if (dto.price != null)
-    // product.setPrice(dto.price);
-    // if (dto.description != null)
-    // product.setDescription(dto.description);
-
-    // ProductsEntity saved = productsRepo.save(product.toEntity(owner));
-
-    // return ProductsMapper.toResponse(Product.fromEntity(saved));
-    // }
 
     /**
      * Convierte ProductEntity a ProductResponseDto
      * Usa estructura anidada para mejor organización semántica
      */
-    private ProductsResponseDto toResponseDto(ProductsEntity entity) {
-        ProductsResponseDto dto = new ProductsResponseDto();
+    private ProductResponseDto toResponseDto(ProductsEntity entity) {
+        ProductResponseDto dto = new ProductResponseDto();
 
         // Campos básicos del producto
         dto.id = entity.getId();
@@ -306,11 +247,11 @@ public class ProductServiceImpl implements ProductService {
         dto.description = entity.getDescription();
 
         // Crear objeto User anidado (se carga LAZY)
-        ProductsResponseDto.UserSummaryDto userDto = new ProductsResponseDto.UserSummaryDto();
+        ProductResponseDto.UserSummaryDto userDto = new ProductResponseDto.UserSummaryDto();
         userDto.id = entity.getOwner().getId();
         userDto.name = entity.getOwner().getName();
         userDto.email = entity.getOwner().getEmail();
-        dto.userId = userDto;
+        dto.user = userDto;
 
         // Crear objeto Category anidado (se carga LAZY)
 
@@ -323,7 +264,7 @@ public class ProductServiceImpl implements ProductService {
             categories.add(categoryDto);
         }
 
-        dto.categoryIds = categories;
+        dto.categories = categories;
         // Auditoría
         dto.createdAt = entity.getCreatedAt();
         dto.updatedAt = entity.getUpdatedAt();

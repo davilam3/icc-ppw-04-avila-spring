@@ -15,17 +15,15 @@ import jakarta.persistence.Table;
 @Table(name = "categories")
 public class CategoryEntity extends BaseModel {
 
-  
-    @Column(nullable = false, unique = true, length = 120)
+    @Column(nullable = false, length = 100, unique = true)
     private String name;
 
     @Column(length = 500)
     private String description;
 
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
-    private Set<ProductsEntity> products = new HashSet<>();
+    private Set<ProductsEntity> product = new HashSet<>();
 
-    // Getters y setters
     public String getName() {
         return name;
     }
@@ -42,12 +40,14 @@ public class CategoryEntity extends BaseModel {
         this.description = description;
     }
 
-    public Set<ProductsEntity> getProducts() {
-        return products;
+    public Set<ProductsEntity> getProduct() {
+        return product;
     }
 
-    public void setProducts(Set<ProductsEntity> products) {
-        this.products = products;
+    public void setProduct(Set<ProductsEntity> product) {
+        this.product = product;
     }
- 
+    public Set<ProductsEntity> getProducts() {
+    return getProducts();
+}
 }

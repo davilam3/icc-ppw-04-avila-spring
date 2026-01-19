@@ -5,23 +5,20 @@ import java.util.List;
 
 import ec.edu.ups.icc.fundamentos01.categories.dtos.CategoriaResponseDto;
 
-public class ProductsResponseDto {
+public class ProductResponseDto {
 
     public Long id;
     public String name;
-    public String description;
     public Double price;
-    public Integer stock;
+    public String description;
+    public String reason;
 
     // ============== OBJETOS ANIDADOS ==============
 
-    public UserSummaryDto userId;
+    public UserSummaryDto user;
+    public List<CategoriaResponseDto> categories;
 
-    // public CategoryResponseDto category;
-    // ============== CATEGORÍAS (N:N) - Lista de objetos ==============
-    public List<CategoriaResponseDto> categoryIds;
-
-    // ============== AUDITORÍA =============
+    // ============== AUDITORÍA ==============
 
     public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
@@ -29,7 +26,7 @@ public class ProductsResponseDto {
     // ============== DTOs INTERNOS ==============
 
     public static class UserSummaryDto {
-        public long id;
+        public Long id;
         public String name;
         public String email;
     }

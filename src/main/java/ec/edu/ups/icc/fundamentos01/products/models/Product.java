@@ -1,6 +1,5 @@
 package ec.edu.ups.icc.fundamentos01.products.models;
 
-
 import ec.edu.ups.icc.fundamentos01.products.dtos.CreateProductsDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.PartialUpdateProductsDto;
 import ec.edu.ups.icc.fundamentos01.products.dtos.UpdateProductsDto;
@@ -11,42 +10,40 @@ public class Product {
 
     private Long id;
     private String name;
-    private String description;
     private Double price;
-    private int stock;
-    private String createdAt;
+    private String description;
+    private String CreatedAt;
 
-    // Constructor privado para forzar uso de factory methods
-    public Product(long id, String name, Double price, String description, int stock) {
+    // Contructor para forzar el uso de factory metodos
+
+    public Product() {}
+
+    public Product(long id, String name, Double price, String description) {
         this.id = id;
         this.name = name;
         this.price = price;
-        this.stock = stock;
         this.description = description;
-        this.createdAt = java.time.LocalDateTime.now().toString();
+
     }
 
-    public Product(String name, Double price, String description,int stock) {
+    public Product(String name, Double price, String description) {
         this.validateBusinessRules(name, price, description);
         this.name = name;
         this.price = price;
         this.description = description;
-        this.stock = stock;
     }
 
     private void validateBusinessRules(String name, Double price, String description) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre del producto es obligatorio");
+            throw new IllegalArgumentException("El nombre del producto debe tener entre 3 y 150 caracteres.");
         }
         if (price == null || price <= 0) {
-            throw new IllegalArgumentException("El precio debe ser mayor a 0");
+            throw new IllegalArgumentException("El precio del producto no puede ser negativo.");
         }
         if (description != null && description.length() > 500) {
-            throw new IllegalArgumentException("La descripción no puede superar 500 caracteres");
+            throw new IllegalArgumentException("La descripción del producto no puede exceder los 500 caracteres.");
         }
     }
-
-    // ==================== FACTORY METHODS ====================
 
     public ProductsEntity toEntity(UserEntity owner) {
         ProductsEntity entity = new ProductsEntity();
@@ -56,7 +53,6 @@ public class Product {
 
         entity.setName(this.name);
         entity.setPrice(this.price);
-        entity.setStock(this.stock);
         entity.setDescription(this.description);
 
         // Asignar relaciones
@@ -68,16 +64,16 @@ public class Product {
     public Product update(UpdateProductsDto dto) {
         this.name = dto.name;
         this.price = dto.price;
-        this.stock = dto.stock;
         this.description = dto.description;
+
         return this;
     }
 
     public Product update(PartialUpdateProductsDto dto) {
         this.name = dto.name;
         this.price = dto.price;
-        this.stock = dto.stock;
         this.description = dto.description;
+
         return this;
     }
 
@@ -85,23 +81,19 @@ public class Product {
      * Crea un Product desde un DTO de creación
      */
     public static Product fromDto(CreateProductsDto dto) {
-        return new Product(dto.name, dto.price, dto.description, dto.stock);
+        return new Product(dto.name, dto.price, dto.description);
     }
 
-    /**
-     * Crea un Product desde una entidad persistente
-     */
     public static Product fromEntity(ProductsEntity entity) {
         Product product = new Product(
                 entity.getName(),
                 entity.getPrice(),
-                entity.getDescription(),
-                entity.getStock());
+                entity.getDescription());
         product.id = entity.getId();
         return product;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -124,14 +116,6 @@ public class Product {
     public void setPrice(Double price) {
         this.price = price;
     }
-    
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
 
     public String getDescription() {
         return description;
@@ -142,39 +126,27 @@ public class Product {
     }
 
     public String getCreatedAt() {
-        return createdAt;
+        return CreatedAt;
     }
 
     public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+        CreatedAt = createdAt;
     }
 
-    
-
     public Product partialUpdate(PartialUpdateProductsDto dto) {
-
         if (dto.name != null) {
             this.name = dto.name;
         }
-
         if (dto.price != null) {
             this.price = dto.price;
         }
-
-        if (dto.stock != null) {
-            this.stock = dto.stock;
-        }
-
         if (dto.description != null) {
             this.description = dto.description;
         }
-
         return this;
     }
 
-
 }
-
 
 // // ==================== FACTORY METHODS ====================
 
@@ -450,4 +422,3 @@ public class Product {
 
 // return this;
 // }
-

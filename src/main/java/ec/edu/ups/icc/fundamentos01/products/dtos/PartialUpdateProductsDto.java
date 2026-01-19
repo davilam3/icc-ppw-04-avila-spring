@@ -1,8 +1,6 @@
 package ec.edu.ups.icc.fundamentos01.products.dtos;
 
 import java.util.List;
-import java.util.Set;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,14 +13,11 @@ public class PartialUpdateProductsDto {
     @Min(value = 0)
     public Double price;
 
-    @Min(value = 0)
-    public Integer stock;
-
     @Size(max = 500)
     public String description;
 
-    @NotNull(message = "Debe especificar al menos una categoría")
-    @Size(min = 1, message = "El producto debe tener al menos una categoría")
-    public Set<Long> categoryIds; // Múltiples categorías
+    @NotNull(message = "Debe especificar las categorias")
+    @Size(min = 1, message = "Debe ingresar al menos un ID de categoría")
+    public List<Long> categoryIds;
 
 }

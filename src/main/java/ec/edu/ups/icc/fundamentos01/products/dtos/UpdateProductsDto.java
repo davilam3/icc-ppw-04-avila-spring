@@ -1,35 +1,36 @@
 package ec.edu.ups.icc.fundamentos01.products.dtos;
 
 import java.util.List;
-import java.util.Set;
-
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class UpdateProductsDto {
 
-    @NotBlank
+    @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 3, max = 150)
     public String name;
 
-    @NotBlank
-    @Min(value = 0)
+    @NotNull(message = "El precio es obligatorio")
+    @DecimalMin(value = "0.0", inclusive = false)
     public Double price;
 
-    @NotBlank
-    @Min(value = 0)
-    public Integer stock;
-
-    @Size(max = 250)
+    @Size(max = 500)
     public String description;
 
-    // m:m
-    @NotBlank(message = "Debe especificar al menos una categoría")
-    @Size(min = 1, message = "El producto debe tener al menos una categoría")
-    public Set<Long> categoryIds;
-    
-    //NO PUEDO ACTULIZAR EL DUEÑO DEL PRODUCTO
-    //  public Long userId;
+    public Long categoryId;
+
+    // ============== ACTUALIZACIÓN DE RELACIONES ==============
+
+    // @NotNull(message = "El ID de la categoría es obligatorio")
+    // public Long categoryId;
+
+    @NotNull(message = "El ID de la categoría es obligatorio")
+    @Size(min = 1, message = "Debe ingresar al menos un ID de categoría")
+    public List<Long> categoryIds; // Ingresemos un listado de IDs de categorias [4-2]
+
+    // Nota: No se permite cambiar el owner de un producto una vez creado
+    // Si fuera necesario, sería una operación de negocio especial
 
 }
