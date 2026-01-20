@@ -93,39 +93,5 @@ public class ProductsController {
         return ResponseEntity.noContent().build();
     }
 
-    // @PostMapping
-    // public ResponseEntity<ProductsResponseDto> create(
-    // @Valid @RequestBody CreateProductsDto dto) {
-    // ProductsResponseDto created = productService.create(dto);
-    // return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    // }
-
-    // @PatchMapping("/{id}")
-    // public ProductsResponseDto partialUpdate(@PathVariable("id") Long id,
-    // @RequestBody PartialUpdateProductsDto dto) {
-    // return productService.partialUpdate(id, dto);
-    // }
-
-    // 16 enero
-    // @GetMapping("/{id}")
-    // public ResponseEntity<ProductsResponseDto> findById(@PathVariable Long id) {
-    // ProductsResponseDto product = productService.findById(id);
-    // return ResponseEntity.ok(product);
-    // }
-
-    // @PutMapping("/{id}")
-    // public ResponseEntity<ProductsResponseDto> update(
-    // @PathVariable Long id,
-    // @Valid @RequestBody UpdateProductsDto dto
-    // ) {
-    // ProductsResponseDto updated = productService.update(id, dto);
-    // return ResponseEntity.ok(updated);
-    // }
-
-    // @DeleteMapping("/{id}")
-    // public ResponseEntity<Void> delete(@PathVariable Long id) {
-    // productService.delete(id);
-    // return ResponseEntity.noContent().build();
-    // }
 
 }

@@ -12,7 +12,6 @@ import ec.edu.ups.icc.fundamentos01.exceptions.domain.ConflictException;
 import ec.edu.ups.icc.fundamentos01.exceptions.domain.NotFoundException;
 import ec.edu.ups.icc.fundamentos01.products.dtos.ProductResponseDto;
 import ec.edu.ups.icc.fundamentos01.products.entities.ProductsEntity;
-import ec.edu.ups.icc.fundamentos01.products.mappers.ProductsMapper;
 import ec.edu.ups.icc.fundamentos01.products.repositories.ProductsRepository;
 import ec.edu.ups.icc.fundamentos01.users.dtos.CreateUserDto;
 import ec.edu.ups.icc.fundamentos01.users.dtos.PartialUpdateUserDto;
@@ -151,21 +150,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<ProductResponseDto> getProductsByUserId(Long userId) {
 
-        // 1. Verificar que el usuario exista
+        // userRepo.findById(userId)
+        // .orElseThrow(() -> new NotFoundException(
+        // "Usuario con id: " + userId + " no encontrado"));
+
+        // return productRepository.findByOwnerId(userId)
+        // .stream()
+        // .map(product -> new ProductResponseDto(
+        // product.getId(),
+        // product.getName(),
+        // product.getPrice(),
+        // product.getDescription()))
+        // .toList();
         userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
                         "Usuario con id: " + userId + " no encontrado"));
 
-        // 2. Consultar productos desde el repositorio de productos
-        return productRepository.findByOwnerId(userId)
+        return productRepository.findByOwnerIdWithCategories(userId)
                 .stream()
-                .map(product -> new ProductResponseDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getPrice(),
-                        product.getDescription()
-                // product.getCategoris()
-                ))
+                .map(this::toResponseDto) 
                 .toList();
     }
 
@@ -177,15 +180,19 @@ public class UserServiceImpl implements UserService {
             Double maxPrice,
             Long categoryId) {
 
-        List<ProductsEntity> products = productRepository.findByOwnerWithFilter(
+        userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Usuario con id: " + userId + " no encontrado"));
+
+        return productRepository.findByOwnerIdWithFilter(
                 userId,
                 name,
                 minPrice,
                 maxPrice,
-                categoryId);
-
-        return products.stream()
+                categoryId)
+                .stream()
                 .map(this::toResponseDto)
+
                 .toList();
     }
 

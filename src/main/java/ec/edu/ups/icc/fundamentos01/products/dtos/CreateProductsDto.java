@@ -24,8 +24,8 @@ public class CreateProductsDto {
     @NotNull(message = "El ID del usuario es obligatorio")
     public Long userId;
 
-    @NotNull(message = "El Id del usuario es obligatoria")
-    public Long categoryId;
+    // @NotNull(message = "El Id del usuario es obligatoria")
+    // public Long categoryId;
 
     // @NotNull(message = "El ID de la categoría es obligatorio")
     // public Long categoryId;
